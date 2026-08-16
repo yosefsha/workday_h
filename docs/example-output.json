@@ -1,0 +1,22 @@
+{
+  "Name": {
+    "FirstName": "Shimon",
+    "LastName": "Peres"
+  },
+  "Linkedin_url": "https://linkedin.com/in/shimon123",
+  "JobExperience": [
+    {
+      "Role": "Programmer",
+      "StartDate": "Jan/20/2013",
+      "EndDate": "Dec/31/2014",
+      "Location": "New York, NY, US",
+      "Gap": "20 days"
+    },
+    {
+      "Role": "Programmer",
+      "StartDate": "Jan/02/2010",
+      "EndDate": "Dec/31/2012",
+      "Location": "Newark, NJ, US"
+    }
+  ]
+}

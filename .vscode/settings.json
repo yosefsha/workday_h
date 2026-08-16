@@ -1,0 +1,32 @@
+{
+  // The virtualenv lives at the repository root, so VS Code activates it in
+  // every new integrated terminal and uses it for analysis without anyone
+  // running `source .venv/bin/activate`.
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+
+  // The application package is backend/app, so `python -m app report` from the
+  // repository root needs backend/ on the path. The venv also carries a .pth
+  // saying the same thing; this line is the part that survives a rebuilt venv,
+  // because .venv is gitignored.
+  "python.analysis.extraPaths": ["${workspaceFolder}/backend"],
+  "terminal.integrated.env.osx": {
+    "PYTHONPATH": "${workspaceFolder}/backend"
+  },
+  "terminal.integrated.env.linux": {
+    "PYTHONPATH": "${workspaceFolder}/backend"
+  },
+
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": ["backend"],
+
+  "[python]": {
+    "editor.formatOnSave": false,
+    "editor.rulers": [100]
+  },
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.ruff_cache": true,
+    "**/.pytest_cache": true
+  }
+}

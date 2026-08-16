@@ -1,0 +1,50 @@
+name: workday-candidate-reporting
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: app
+    ports:
+      # Published so `python -m app report` runs against the same database
+      # from the host, without a container. 5433 rather than 5432 because a
+      # developer machine with a native Postgres already owns the default
+      # port on loopback, and the collision is silent: connections reach the
+      # wrong server and fail with "role app does not exist".
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  api:
+    build: ./backend
+    environment:
+      # `db` is the compose service name; inside the network it resolves to
+      # the database container.
+      DATABASE_URL: postgresql+psycopg://app:app@db:5432/app
+      # Unset by default, which leaves POST /ingest unregistered. Set it to
+      # enable HTTP-triggered ingest:  INGEST_TOKEN=... docker compose up
+      INGEST_TOKEN: ${INGEST_TOKEN:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        # Not just "started": the entrypoint runs migrations immediately, and
+        # a database still booting would fail them.
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import httpx,sys; sys.exit(0 if httpx.get('http://localhost:8000/health').status_code==200 else 1)\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  postgres-data:
